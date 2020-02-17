@@ -1,14 +1,16 @@
-from celery import shared_task
+from celery import task
 from django.core.mail import send_mail
 from .models import Order
-
-
-@shared_task
+@task
 def order_created(order_id):
-    # order = Order.objects.get(id=order_id)
-    # subject = 'Order № {}'.format(order.id)
-    # message = '{},\n Your order succesfully added.\n\
-    #     Your order`s id {}'.format(order.first_name, order.id)
-    mail_sent = send_mail('subject', 'message', 'admin@mail.ru', ['ex@gmail.com', ])
-
+    """Задача отправки email-уведомлений при успешном оформлении заказа."""
+    order = Order.objects.get(id=order_id)
+    subject = 'Order nr. {}'.format(order.id)
+    message = 'Dear {},\n\nYou have successfully placed an order.\
+    Your order id is {}.'.format(order.first_name,
+                                 order.id)
+    mail_sent = send_mail(subject,
+                          message,
+                          'phanade84@gmail.com',
+                          [order.email])
     return mail_sent
